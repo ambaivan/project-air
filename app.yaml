@@ -1,0 +1,15 @@
+runtime: python310
+
+entrypoint: gunicorn -b :$PORT myapp:app
+
+instance_class: F2  # Optional - F2 is a bit more powerful than default F1
+
+env_variables:
+  FLASK_ENV: production
+
+handlers:
+  - url: /static
+    static_dir: static
+
+  - url: /.*
+    script: auto
