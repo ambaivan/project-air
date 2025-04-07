@@ -3,3 +3,4 @@ steps:
     args: ['app', 'deploy', 'app.yaml']
 
 timeout: '900s'
+logsBucket: 'gs://airbucket1'
