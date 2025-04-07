@@ -1,6 +1,0 @@
-steps:
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['app', 'deploy', 'app.yaml']
-
-timeout: '900s'
-logsBucket: 'gs://airbucket1'
