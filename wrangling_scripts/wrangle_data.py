@@ -6,6 +6,7 @@ import plotly.graph_objs as go
 # `data/file_name.csv`
 def prepdata(dataset='data/missile_attacks_daily.csv'):
     df=pd.read_csv(dataset)
+    #print("Deployed data preview:\n", df.head())
     # means of attack
     df['model_group'] = df['model'].replace({
     'Orlan-10': 'Other drones',
@@ -43,12 +44,20 @@ def prepdata(dataset='data/missile_attacks_daily.csv'):
     "X-22/X-32": 1.0,
     "X-47 Kinzhal": 10.0,
     "Other models":0.05}
-    df['weapon_price'] = df['model_group'].map(weapon_prices)
+    df['weapon_price'] = df['model_group'].map(weapon_prices).fillna(0)
     df['cost_of_attack'] = df['weapon_price'] * df['launched']
-    #df['year']=pd.to_datetime(df['time_start']).dt.year
+    #df['year']=pd.to_datetime(df['time_start'], format='%Y-%m-%d %H:%M', errors='coerse').dt.year
     df['year'] = pd.to_datetime(df['time_start'], errors='coerce').apply(lambda x: x.year if pd.notnull(x) else None)
 
-
+    #df['year']=df['year'].replace({2025:'Q1 2025'})
+    #df['year']=df['year'].astype(str)
+    #from pandas.api.types import CategoricalDtype
+    #year_order=CategoricalDtype(categories=['2022','2023','2024','Q1 2025'],ordered=True)
+    #df['year']=df['year'].astype(year_order)
+    #print(df['year'].unique())
+    df['time_start']=pd.to_datetime(df['time_start'], errors='coerce')
+    df['day']=df['time_start'].dt.date
+    df['month']=df['time_start'].dt.to_period('M').dt.to_timestamp()
 
     return df
 
@@ -70,21 +79,32 @@ def return_figures():
     #####Chart 1 - number of aerial attacks per year
     graph_one = []
     df=prepdata()
-    attacks_per_annum=pd.DataFrame(df.groupby('year').size()).reset_index()
-    attacks_per_annum.columns=['year','quantity']
+    attacks_per_annum=pd.DataFrame(df.groupby('month').size()).reset_index()
+    attacks_per_annum.columns=['period','quantity']
     graph_one.append(
       go.Bar(
-      x = attacks_per_annum['year'],
+      x = attacks_per_annum['period'],
       y = attacks_per_annum['quantity'],
       marker_color='rgb(64, 60, 45)'
       )
     )
 
     layout_one = dict(title = 'Number of aerial attacks',
-                xaxis = dict(title = 'Year'),
+                xaxis = dict(title = '<i>Select period</i>', type='date', rangeselector=dict(
+                buttons=[
+                dict(count=6, label='6m', step='month', stepmode='backward'),
+                dict(count=1, label='1y', step='year', stepmode='backward'),
+                dict(step='all')
+                ]
+                ),
+                rangeslider=dict(visible=True),
+                ),
                 yaxis = dict(title = '# of attacks launched'),
+                #height=350,
+                margin=dict(l=60, r=20, b=50, t=100, pad=10),
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',   # chart area background
+
                 )
 
 # Chart 2 - Type of weapons launched
@@ -117,34 +137,47 @@ def return_figures():
     layout_two = dict(
         title='Weapons launched by weapon type',
         barmode='stack',  # <== Important for stacked bars
-        xaxis=dict(title='Year'),
+        xaxis=dict(title=' '),
         yaxis=dict(title='Quantity launched', tickfont=dict(size=9),
-               tickvals=[100, 1000, 5000, 10000, 20000, 30000],
-               ticktext=['100', '1,000', '5,000', '10,000', '20,000', '30,000']),
+               tickvals=[0, 100, 1000, 5000, 10000, 20000, 30000],
+               ticktext=['0','100', '1,000', '5,000', '10,000', '20,000', '30,000']),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',   # chart area background
+        margin=dict(l=60, r=20, b=50, t=100, pad=10),
+        #height=350,
 )
 
 
 # Chart 3 - Air defence effectiveness
     graph_three = []
     df=prepdata()
-    objects_destroyed=df.groupby('year')['destroyed'].sum()
-    objects_launched=df.groupby('year')['launched'].sum()
+    objects_destroyed=df.groupby('month')['destroyed'].sum()
+    objects_launched=df.groupby('month')['launched'].sum()
     objects_summary = pd.concat([objects_launched, objects_destroyed], axis=1).reset_index()
     objects_summary['effectiveness']=np.round(objects_summary['destroyed']/objects_summary['launched'],2)
     graph_three.append(
       go.Scatter(
       y = objects_summary['effectiveness'],
-      x = objects_summary['year'],
+      x = objects_summary['month'],
       mode = 'lines+markers',
       marker_color='rgb(64, 60, 45)'
       )
     )
 
-    layout_three = dict(title = 'Air deffence effectiveness 2022-2025 <br> (as share of destroyed targets)',
-                xaxis = dict(title = 'Year'),
+    layout_three = dict(title = 'Air deffence effectiveness <br> (as share of destroyed targets)',
+                xaxis = dict(title = '<i>Select period</i>', type='date', rangeselector=dict(
+                buttons=[
+                dict(count=6, label='6m', step='month', stepmode='backward'),
+                dict(count=1, label='1y', step='year', stepmode='backward'),
+                dict(step='all')
+                ]
+                ),
+                rangeslider=dict(visible=True),
+                ),
                 yaxis = dict(title = '% of destroyed objects', range=[0,1],),
+                #height=350,
+                margin=dict(l=60, r=20, b=50, t=100, pad=10),
+
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',   # chart area background
                        )
@@ -163,7 +196,7 @@ def return_figures():
         pattern = fr'{city}|Ukraine|{direction}'
         # Group by year and city, and count occurrences of the pattern
         city_targets = df[df['target'].str.contains(pattern, case=False, na=False)]
-        yearly_counts = city_targets.groupby('year').size().reset_index(name='attack_count')
+        yearly_counts = city_targets.groupby('month').size().reset_index(name='attack_count')
         yearly_counts['city'] = city
         targets.append(yearly_counts)
 
@@ -182,7 +215,7 @@ def return_figures():
     for city, color in zip(cities, muted_colors):
         city_data = targets_of_attack[targets_of_attack['city'] == city]
         graph_four.append(go.Scatter(
-            x=city_data['year'],
+            x=city_data['month'],
             y=city_data['attack_count'],
             mode='lines+markers',  # Line with markers
             name=city,
@@ -191,8 +224,18 @@ def return_figures():
         )
 
     layout_four = dict(title = 'Attacks on Ukraine biggest cities',
-                xaxis = dict(title = 'Year'),
+                xaxis = dict(title = '<i>Select period</i>', type='date', rangeselector=dict(
+                buttons=[
+                dict(count=6, label='6m', step='month', stepmode='backward'),
+                dict(count=1, label='1y', step='year', stepmode='backward'),
+                dict(step='all')
+                ]
+                ),
+                rangeslider=dict(visible=True),
+                ),
                 yaxis = dict(title = 'Number of attacks'),
+                #height=350,
+                margin=dict(l=60, r=20, b=50, t=100, pad=10),
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',   # chart area background
                 )
@@ -211,11 +254,15 @@ def return_figures():
       )
     )
 
-    layout_five = dict(title = 'Approx. cost to the russian taxpayer of <br> aerial attacks launched against Ukraine',
+    layout_five = dict(title = dict(text='Cost to russian taxpayer of<br>aerial attacks against Ukraine', x=0.5, xanchor='center'),
                 xaxis = dict(title = 'Year', tickvals=cost_of_war['year'].tolist(), ticktext=cost_of_war['year'].astype(str).tolist()),
                 yaxis = dict(title = 'cost in mln USD', tickformat=',',),
+                #height=350,
+                margin=dict(l=100, r=20, b=50, t=100, pad=10),
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',   # chart area background
+                #autosize= True
+
                 )
     # append all charts to the figures list
     figures = []

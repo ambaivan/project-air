@@ -1,4 +1,4 @@
-runtime: python310  # or python310 if you prefer
+runtime: python39  # or python310 if you prefer
 entrypoint: gunicorn -b :$PORT myapp:app
 
 instance_class: F1

@@ -37,6 +37,22 @@
         }
     </style>
 
+    <style>
+      .chart-block {
+        margin-bottom: 2rem;
+
+      }
+    </style>
+
+    <style>
+      .responsive-chart {
+        min-height: 350px;
+        height: auto
+
+      }
+    </style>
+
+
 </head>
 
 <body>
@@ -59,6 +75,9 @@
       <li class="nav-item">
         <a class="nav-link" href="https://linkedin.com/">About the Author</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/ambaivan/project-air">GitHub repo</a>
+      </li>
     </ul>
   </div>
 </nav>
@@ -71,7 +90,7 @@
   <div class="col-1 border-right d-none d-md-block">
       <div id="follow-me" class="mt-3">
           <a href="https://bank.gov.ua/en/about/support-the-armed-forces/">
-              <img src="/static/img/donate.jpg" alt="Donate" class="img-fluid mb-4 ml-2">
+              <img src="/static/img/donate.jpg" alt="Donate" class="img-fluid mb-2 ml-2">
           </a>
           <a href="https://mod.gov.ua/en">
               <img src="/static/img/afu_logo.png" alt="general_staff" class="img-fluid ml-2">
@@ -104,23 +123,29 @@
             <!--top two charts-->
             <div class="row">
                 <div class="col-12 col-md-6 mb-4">
-                    <div id="{{ids[0]}}"></div>
+                  <section class="chart-block">
+                    <div id="{{ids[0]}}" class="responsive-chart"></div>
                     <p class="chart-comment text-muted mt-2" style="text-align:left; font-size: 1rem;">
                 Unable to achieve success on the battlefield, Russia significantly stepped up its aerial attacks
-                targeting Ukraine’s energy and civil infrastructure in an apparent shift
-                to weaken the country’s resilience and morale
+                targeting Ukraine’s energy and civil infrastructure in an apparent shift to weaken the country’s
+                resilience and morale. <br><br>The data shows a sharp rise in attacks in 2023, peaking in 2024 with over
+                double the number from the previous year. This surge highlights a deliberate strategy to maximize
+                disruption during critical periods, especially winter.
             </p>
+          </section>
                 </div>
                 <div class="col-12 col-md-6 mb-4">
-                    <div id="{{ids[1]}}"></div>
+                  <section class="chart-block">
+                    <div id="{{ids[1]}}" class="responsive-chart"></div>
                     <p class="chart-comment text-muted mt-2" style="text-align:left; font-size: 1rem;">
-                Iranian-designed Shahed drones and X-101/X-555 cruise missiles launched by strategic bombers
+                <i>[TIP: De-select Shahed for better view of other weapons]</i><br><br>Iranian-designed Shahed drones and X-101/X-555 cruise missiles launched by strategic bombers
                 over the Caspian Sea remain Russia’s most frequently deployed weapons against Ukraine.
                 However, due to their limited effectiveness against Ukraine’s increasingly capable air defenses,
                 Russia has turned to more sophisticated weaponry. The use of the extremely costly Kinzhal
                 hypersonic missiles has doubled, while the deployment of the newer Iskander-class ballistic
-                missiles has increased fivefold
+                missiles has increased fivefold. In Q1 2025 Russia launched as many Shaheds as in the whole year of 2024 having scaled thier production.
             </p>
+          </section>
                 </div>
             </div>
 
@@ -128,7 +153,7 @@
             <div class="row mb-6">
                 <div class="col-12 col-md-6 mb-4">
                     <div id="chart3">
-                        <div id="{{ids[2]}}"></div>
+                        <div id="{{ids[2]}}" class="responsive-chart"></div>
                         <p class="chart-comment text-muted mt-2" style="text-align:left; font-size: 1rem;">
                           Ukraine’s air defense continues to perform at a highly effective level.
                           The decline observed in 2024 is largely attributed to a sharp increase
@@ -144,7 +169,7 @@
                 </div>
                 <div class="col-12 col-md-6 mb-4">
                     <div id="chart4">
-                        <div id="{{ids[3]}}"></div>
+                        <div id="{{ids[3]}}" class="responsive-chart"></div>
                         <p class="chart-comment text-muted mt-2" style="text-align:left; font-size: 1rem;">
                           Ironically, the predominantly Russian-speaking city of Odesa remains a primary target of
                           Russian aerial assaults. Kyiv and Lviv face attacks with comparable frequency. Due to their
@@ -161,7 +186,7 @@
             <div class="row mb-6">
                 <div class="col-12">
                     <div id="chart5">
-                        <div id="{{ids[4]}}"></div>
+                        <div id="{{ids[4]}}" class="responsive-chart"></div>
                         <p class="chart-comment mt-2" style="text-align:left; font-size: 1rem;">
                 In 2024 alone, Russia spent more on aerial attacks against Ukraine than it did on healthcare
                 for its entire population. Cumulatively over the past three years, the cost of these aerial
@@ -172,15 +197,15 @@
                 </div>
         </div>
     <div>
-</div>
+  </div>
 
-<!--footer section-->
-<div id="footer" class="container"></div>
+  <!--footer section-->
+  <div id="footer" class="container"></div>
 
-</body>
+  </body>
 
 
-<footer>
+  <footer>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script type="text/javascript">
         // plots the figure with id
@@ -195,7 +220,7 @@
         }
     </script>
 
-</footer>
+  </footer>
 
 
-</html>
+  </html>
